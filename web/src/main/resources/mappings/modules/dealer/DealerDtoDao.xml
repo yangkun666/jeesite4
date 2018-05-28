@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miaocup.modules.dealer.dao.DealerDtoDao">
+	
+	<select id="findList" resultType="com.miaocup.modules.dealer.entity.DealerDto">
+		SELECT
+			company_code,
+			max(c.company_name) company_name,
+			sum(o.amount) amount,
+			sum(o.amount) * c.extend_f1 / 100 brokerage
+		FROM
+			js_sys_company c
+		LEFT JOIN t_order_info o ON c.company_code = o.dealer and o.`status` = 1
+		WHERE
+			c.parent_code = 'MYB'
+			<if test="startDate != null">
+				and DATE_FORMAT(o.create_date, '%Y%m%d') &gt;= DATE_FORMAT(#{startDate}, '%Y%m%d')
+			</if>
+			<if test="endDate != null">
+				and DATE_FORMAT(o.endDate, '%Y%m%d') &lt;= DATE_FORMAT(#{endDate}, '%Y%m%d')
+			</if>
+		GROUP BY
+			c.company_code
+	</select>
+	
+</mapper>

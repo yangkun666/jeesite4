@@ -1,0 +1,364 @@
+<% layout('/layouts/default.html',  {title: '咖啡机统计', libs: ['dataGrid']}){ %>
+<!-- <link rel="stylesheet" href="${ctxStatic}/modules/sys/sysDesktop.css?${_version}"> -->
+
+<div class="content pb0">
+	<#form:form id="searchForm" model="${orderInfoCondition}" action="${ctx}/cm/coffeeMaker/statisticsData" method="post" class="form-inline"
+			data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+		<div class="form-group">
+			<label class="control-label">咖啡机：</label>
+			<div class="control-inline width-120">
+				<#form:select path="coffeeMakerId" items="${coffeeMakerList}"
+						itemLabel="code" itemValue="id" blankOption="true" class="form-control"/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label">统计时间：</label>
+			<div class="control-inline">
+				<#form:input path="lastStatisticsTime_gte" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+						dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false,onpicked:function(){lastStatisticsTime_lte.click()}});"/>
+				&nbsp;--&nbsp;
+				<#form:input path="lastStatisticsTime_lte" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+						dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+			</div>
+		</div>
+		<div class="form-group">
+			<button type="button" onclick="getStatisticsData()" class="btn btn-primary btn-sm">查询</button>
+			<button type="button" class="btn btn-default btn-sm" onclick="setReset()" >重置</button>
+		</div>
+	</#form:form>
+	<!-- /.row -->
+	<div class="row">
+		<div class="col-md-12">
+			<div class="box">
+				<div class="box-header with-border">
+					<h3 class="box-title">咖啡机统计报表</h3>
+					<div class="box-tools pull-right">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse">
+							<i class="fa fa-minus"></i>
+						</button>
+						<div class="btn-group">
+							<button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+								<i class="fa fa-wrench"></i></button>
+						</div>
+					</div>
+				</div>
+				<!-- /.box-header -->
+				<div class="box-body">
+					<div class="row">
+							<div class="chart">
+								<div id="myChart" style="height:350px;width:99%"></div>
+								<script src="http://echarts.baidu.com/dist/echarts.common.min.js"></script>
+								<script>
+									var option = {
+										title : {
+											text: ' 统计报表'
+										},
+										tooltip : {
+											trigger: 'axis'
+										},
+										legend: {
+											data:['支付中','支付成功','支付失败','退款中','退款成功','退款失败']
+										},
+										toolbox: {
+											show : true,
+											feature : {
+												mark : {show: true},
+												dataView : {show: true, readOnly: false},
+												magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+												restore : {show: true},
+												saveAsImage : {show: true}
+											}
+										},
+										calculable : true,
+										grid : {
+											top: '49',
+											right: '20',
+											bottom: '30'
+										},
+										xAxis : [
+											{
+												type : 'category',
+												boundaryGap : false,
+												data : ['周一','周二','周三','周四','周五','周六','周日']
+											}
+										],
+										yAxis : [
+											{
+												type : 'value'
+											}
+										],
+										series : [
+											{
+												name:'支付中',
+												type:'line',
+												smooth:true,
+												itemStyle: {normal: {areaStyle: {type: 'default'}}},
+												data:[10, 12, 21, 54, 260, 830, 710]
+											},
+											{
+												name:'支付成功',
+												type:'line',
+												smooth:true,
+												itemStyle: {normal: {areaStyle: {type: 'default'}}},
+												data:[30, 182, 434, 791, 390, 30, 10]
+											},
+											{
+												name:'支付失败',
+												type:'line',
+												smooth:true,
+												itemStyle: {normal: {areaStyle: {type: 'default'}}},
+												data:[1320, 1132, 601, 234, 120, 90, 20]
+											},
+											{
+												name:'退款中',
+												type:'line',
+												smooth:true,
+												itemStyle: {normal: {areaStyle: {type: 'default'}}},
+												data:[20, 22, 31, 64, 360, 930, 810]
+											},
+											{
+												name:'退款成功',
+												type:'line',
+												smooth:true,
+												itemStyle: {normal: {areaStyle: {type: 'default'}}},
+												data:[20, 182, 534, 891, 490, 40, 20]
+											},
+											{
+												name:'退款失败',
+												type:'line',
+												smooth:true,
+												itemStyle: {normal: {areaStyle: {type: 'default'}}},
+												data:[1220, 2132, 701, 334, 220, 80, 10]
+											}
+										]
+									};
+									// 基于准备好的dom，初始化echarts实例
+									var myChart = echarts.init(document.getElementById('myChart'));
+									myChart.setOption(option);
+								</script>
+							</div>
+							<!-- /.chart-responsive -->
+						</div>
+						<!-- /.col
+						<div class="col-md-4">
+							<p class="text-center">
+								<strong>完成目标</strong>
+							</p>
+							<div class="progress-group">
+								<span class="progress-text">将产品添加到购物车</span>
+								<span class="progress-number"><b>160</b>/200</span>
+								<div class="progress sm">
+									<div class="progress-bar progress-bar-aqua" style="width: 80%"></div>
+								</div>
+							</div>
+							<!-- /.progress-group
+							<div class="progress-group">
+								<span class="progress-text">完成购买率</span>
+								<span class="progress-number"><b>310</b>/400</span>
+								<div class="progress sm">
+									<div class="progress-bar progress-bar-red" style="width: 80%"></div>
+								</div>
+							</div>
+							<!-- /.progress-group
+							<div class="progress-group">
+								<span class="progress-text">产品访问量</span>
+								<span class="progress-number"><b>480</b>/800</span>
+								<div class="progress sm">
+									<div class="progress-bar progress-bar-green" style="width: 80%"></div>
+								</div>
+							</div>
+							<!-- /.progress-group
+							<div class="progress-group">
+								<span class="progress-text">查询访问量</span>
+								<span class="progress-number"><b>250</b>/500</span>
+								<div class="progress sm">
+									<div class="progress-bar progress-bar-yellow" style="width: 80%"></div>
+								</div>
+							</div>
+							<!-- /.progress-group
+						</div>
+						<!-- /.col -->
+					</div>
+					<!-- /.row -->
+				<!-- ./box-body -->
+				<div class="box-footer">
+					<div class="row">
+						<div class="col-sm-3 col-xs-6">
+							<div class="description-block border-right">
+								<span class="description-percentage text-green"></span>
+								<h5 class="description-header">${ckNum}</h5>
+								<span class="description-text">咖啡总数</span>
+							</div>
+							<!-- /.description-block -->
+						</div>
+						<!-- /.col -->
+						<div class="col-sm-3 col-xs-6">
+							<div class="description-block border-right">
+								<span class="description-percentage text-yellow"></span>
+								<h5 class="description-header" >${LYNum}</h5>
+								<span class="description-text">营业额</span>
+							</div>
+							<!-- /.description-block -->
+						</div>
+						<!-- /.col -->
+						<div class="col-sm-3 col-xs-6">
+							<div class="description-block border-right">
+								<span class="description-percentage text-green"></span>
+								<h5 class="description-header">${TKNum}</h5>
+								<span class="description-text">退款总数</span>
+							</div>
+							<!-- /.description-block -->
+						</div>
+						<!-- /.col -->
+						<div class="col-sm-3 col-xs-6">
+							<div class="description-block">
+								<span class="description-percentage text-red"></span>
+								<h5 class="description-header">${TKJENum}</h5>
+								<span class="description-text">退款金额</span>
+							</div>
+							<!-- /.description-block -->
+						</div>
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.box-footer -->
+			</div>
+			<!-- /.box -->
+		</div>
+		<!-- /.col -->
+	</div>
+	<!-- /.row -->
+</div>
+<footer class="main-footer m0">
+	<% var productName = @Global.getConfig('productName'), productVersion = @Global.getConfig('productVersion'); %>
+	<div class="pull-right hidden-xs">当前版本： ${productVersion}</div>
+	版权所有 &copy; ${@DateUtils.getYear()} ${productName} - Powered By <a href="http://jeesite.com">JeeSite</a>.
+</footer>
+<% } %>
+<script>
+    window.onload = function name(){
+        getStatisticsData();
+    }
+	function setReset(){
+        $('#searchForm').resetForm();
+        getStatisticsData();
+    }
+	function getStatisticsData(){
+		var myChart = echarts.init(document.getElementById('myChart'));
+		$.ajax({
+			//几个参数需要注意一下
+			type: "POST",//方法类型
+			dataType: "json",//预期服务器返回的数据类型
+			url: "${ctx}/cm/coffeeMaker/statisticsData" ,//url
+			data: $('#searchForm').serialize(),
+			success: function (result) {
+                var names = [];
+                var nums0 = [];
+                var nums1 = [];
+                var nums2 = [];
+                var nums3 = [];
+                var nums4 = [];
+                var nums5 = [];
+				console.log(result["orderInfoResultList"]);//打印服务端返回的数据(调试用)
+				if (result["orderInfoResultList"]) {
+					var time = "";
+                    $.each(result["orderInfoResultList"],function(index,item){
+                        console.log(item.time);
+                        if(item.time!=time){
+                            names.push(item.time);    //挨个取出类别并填入类别数组
+                            time = item.time;
+                        }
+                    });
+					console.log(names)
+					for(var i=0;i<names.length;i++){
+						nums0.push(0);
+						nums1.push(0);
+						nums2.push(0);
+						nums3.push(0);
+						nums4.push(0);
+						nums5.push(0);
+                        $.each(result["orderInfoResultList"],function(index,item){
+							if(item.time==names[i]){
+								if(item.status=="0"){
+									nums0[nums0.length-1] = item.count;
+								}
+								if(item.status=="1"){
+									nums1[nums1.length-1] = item.count;
+								}
+								if(item.status=="2"){
+									nums2[nums2.length-1] = item.count;
+								}
+								if(item.status=="3"){
+									nums3[nums3.length-1] = item.count;
+								}
+								if(item.status=="4"){
+									nums4[nums4.length-1] = item.count;
+								}
+								if(item.status=="5"){
+									nums5[nums5.length-1] = item.count;
+								}
+							}
+                        });
+					}
+					myChart.hideLoading();    //隐藏加载动画
+					myChart.setOption({        //加载数据图表
+						xAxis: {
+							data: names
+						},
+						series: [{
+							name:'支付中',
+							type:'line',
+							smooth:true,
+							itemStyle: {normal: {areaStyle: {type: 'default'}}},
+							data:nums0
+						},
+							{
+								name:'支付成功',
+								type:'line',
+								smooth:true,
+								itemStyle: {normal: {areaStyle: {type: 'default'}}},
+								data:nums1
+							},
+							{
+								name:'支付失败',
+								type:'line',
+								smooth:true,
+								itemStyle: {normal: {areaStyle: {type: 'default'}}},
+								data:nums2
+							},
+							{
+								name:'退款中',
+								type:'line',
+								smooth:true,
+								itemStyle: {normal: {areaStyle: {type: 'default'}}},
+								data:nums3
+							},
+							{
+								name:'退款成功',
+								type:'line',
+								smooth:true,
+								itemStyle: {normal: {areaStyle: {type: 'default'}}},
+								data:nums4
+							},
+							{
+								name:'退款失败',
+								type:'line',
+								smooth:true,
+								itemStyle: {normal: {areaStyle: {type: 'default'}}},
+								data:nums5
+							}]
+					});
+
+				}
+			},
+			error : function() {
+				alert("异常！");
+			}
+		});
+	}
+	$(window).resize(function(){
+		var footerHeight  = $('.main-footer').outerHeight() || 0;
+		var windowHeight  = $(window).height();
+		$('.content').css('min-height', windowHeight - footerHeight)
+	}).resize();
+</script>

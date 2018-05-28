@@ -1,0 +1,70 @@
+<% layout('/layouts/default.html', {title: '默认图片配置管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 默认图片配置管理
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+				<% if(hasPermi('client:defaultImage:edit')){ %>
+					<a href="${ctx}/client/defaultImage/form" class="btn btn-default btnTool" title="新增默认图片配置"><i class="fa fa-plus"></i> 新增</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${defaultImage}" action="${ctx}/client/defaultImage/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">默认图片名称：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">图片地址：</label>
+					<div class="control-inline">
+						<#form:input path="image" maxlength="256" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'默认图片名称', name:'name', index:'a.name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/client/defaultImage/form?id='+row.id+'" class="btnList" data-title="编辑默认图片配置">'+(val||row.id)+'</a>';
+		}},
+		{header:'图片地址', name:'image', index:'a.image', width:150, align:"left" },
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('client:defaultImage:edit')){ %>
+				actions.push('<a href="${ctx}/client/defaultImage/form?id='+row.id+'" class="btnList" title="编辑默认图片配置"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/client/defaultImage/disable?id='+row.id+'" class="btnList" title="停用默认图片配置" data-confirm="确认要停用该默认图片配置吗？"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/client/defaultImage/enable?id='+row.id+'" class="btnList" title="启用默认图片配置" data-confirm="确认要启用该默认图片配置吗？"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/client/defaultImage/delete?id='+row.id+'" class="btnList" title="删除默认图片配置" data-confirm="确认要删除该默认图片配置吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

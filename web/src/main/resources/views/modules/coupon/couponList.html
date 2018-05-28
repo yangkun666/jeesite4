@@ -1,0 +1,107 @@
+<% layout('/layouts/default.html', {title: '优惠券管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 优惠券管理
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+				<% if(hasPermi('coupon:coupon:edit')){ %>
+					<a href="${ctx}/coupon/coupon/form" class="btn btn-default btnTool" title="新增优惠券"><i class="fa fa-plus"></i> 新增</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${coupon}" action="${ctx}/coupon/coupon/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">减多少元：</label>
+					<div class="control-inline">
+						<#form:input path="minus" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">描述：</label>
+					<div class="control-inline">
+						<#form:input path="remarks" maxlength="512" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">状态：</label>
+					<div class="control-inline width-120">
+						<#form:select path="status" dictType="sys_search_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">获取方式：</label>
+					<div class="control-inline">
+						<#form:input path="getWay" maxlength="3" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">满多少元：</label>
+					<div class="control-inline">
+						<#form:input path="overPrice" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">结束时间：</label>
+					<div class="control-inline">
+						<#form:input path="endDate" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'减多少元', name:'minus', index:'a.minus', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/coupon/coupon/form?id='+row.id+'" class="btnList" data-title="编辑优惠券">'+(val||row.id)+'</a>';
+		}},
+		{header:'描述', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'创建时间', name:'createDate', index:'a.create_date', width:150, align:"center"},
+        {header:'类型', name:'type', index:'a.type', width:150, align:"center", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('coupon_type')}, val, '未知', true);
+            }},
+		{header:'状态', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_search_status')}, val, '未知', true);
+		}},
+		{header:'获取方式', name:'getWay', index:'a.get_way', width:150, align:"center"},
+		{header:'满多少元', name:'overPrice',hidden : true, index:'a.over_price', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'结束时间', name:'endDate', index:'a.end_date', width:150, align:"center"},
+		{header:'发放等级', name:'userGrade.name', index:'userGrade.id', width:150, align:"center"},
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('coupon:coupon:edit')){ %>
+				actions.push('<a href="${ctx}/coupon/coupon/form?id='+row.id+'" class="btnList" title="编辑优惠券"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/coupon/coupon/disable?id='+row.id+'" class="btnList" title="停用优惠券" data-confirm="确认要停用该优惠券吗？"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/coupon/coupon/enable?id='+row.id+'" class="btnList" title="启用优惠券" data-confirm="确认要启用该优惠券吗？"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/coupon/coupon/delete?id='+row.id+'" class="btnList" title="删除优惠券" data-confirm="确认要删除该优惠券吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

@@ -1,0 +1,59 @@
+<% layout('/layouts/default.html', {title: '咖啡品种管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 咖啡品种管理
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+				<% if(hasPermi('cm:coffee:edit')){ %>
+					<a href="${ctx}/cm/coffee/form" class="btn btn-default btnTool" title="新增咖啡品种"><i class="fa fa-plus"></i> 新增</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${coffee}" action="${ctx}/cm/coffee/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">咖啡名称：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'咖啡名称', name:'name', index:'a.name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/cm/coffee/form?id='+row.id+'" class="btnList" data-title="编辑咖啡品种">'+(val||row.id)+'</a>';
+		}},
+		{header:'描述', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'创建时间', name:'createDate', index:'a.create_date', width:150, align:"center"},
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('cm:coffee:edit')){ %>
+				actions.push('<a href="${ctx}/cm/coffee/form?id='+row.id+'" class="btnList" title="编辑咖啡品种"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/cm/coffee/delete?id='+row.id+'" class="btnList" title="删除咖啡品种" data-confirm="确认要删除该咖啡品种吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

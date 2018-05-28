@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miaocup.modules.order.dao.OrderInfoDao">
+	<sql id="OrderInfoResultColumns">
+		COUNT(*) AS "count" ,
+		DATE_FORMAT(a.create_date,'%Y-%m-%d')  as "time",
+		a.status AS "status"
+	</sql>
+	<select id="statisticsData" resultType="com.miaocup.modules.order.entity.OrderInfoResult">
+		select
+		<include refid="OrderInfoResultColumns"/>
+		from t_order_info a
+		where 1=1
+			<if test="coffeeMakerId != null and coffeeMakerId != ''">
+				AND a.cm_id = #{coffeeMakerId}
+			</if>
+			<if test="dealer != null and dealer != ''">
+				AND a.dealer = #{dealer}
+			</if>
+			<if test="payChannel != null and payChannel != ''">
+				AND a.pay_channel = #{payChannel}
+			</if>
+			<if test="lastStatisticsTime_gte != null and lastStatisticsTime_lte != null ">
+				AND DATE_FORMAT(a.create_date,'%Y-%m-%d') BETWEEN DATE_FORMAT(#{lastStatisticsTime_gte,jdbcType=TIMESTAMP},'%Y-%m-%d') AND DATE_FORMAT(#{lastStatisticsTime_lte,jdbcType=TIMESTAMP},'%Y-%m-%d')
+			</if>
+			<if test="(lastStatisticsTime_gte != null ) and (lastStatisticsTime_lte == null)">
+				AND DATE_FORMAT(a.create_date,'%Y-%m-%d') &gt;= DATE_FORMAT(#{lastStatisticsTime_gte,jdbcType=TIMESTAMP},'%Y-%m-%d')
+			</if>
+			<if test="(lastStatisticsTime_gte == null ) and (lastStatisticsTime_lte != null )">
+				AND DATE_FORMAT(a.create_date,'%Y-%m-%d') &lt;= DATE_FORMAT(#{lastStatisticsTime_lte,jdbcType=TIMESTAMP},'%Y-%m-%d')
+			</if>
+		GROUP BY DATE_FORMAT(a.create_date,'%Y-%m-%d') , a.status
+		ORDER BY DATE_FORMAT(a.create_date,'%Y-%m-%d');
+	</select>
+
+	<select id="statisticsDay" resultType="java.lang.Integer" >
+		select
+		count(*)
+		from t_order_info a
+		where
+		FROM_UNIXTIME(create_date,'%Y-%m-%d')=CURDATE()  and a.`status`="1";
+	</select>
+	<select id="statisticsMonth" resultType="java.lang.Integer" >
+		SELECT count(*) FROM t_order_info a WHERE date_format(a.create_date,'%Y-%m')=date_format(now(),'%Y-%m') and a.`status`="1";
+	</select>
+	<select id="statisticsMap"  resultType="com.miaocup.modules.order.entity.MapResult">
+		select c.`name` as "name", count(*) as "count" from t_coffee c
+		JOIN t_coffee_map m on m.coffee_id = c.id
+		JOIN t_order_details o on o.coffee_id = m.id
+		JOIN t_order_info i on i.id = o.order_id and i.`status` = '1'
+		GROUP BY c.`name`
+	</select>
+</mapper>

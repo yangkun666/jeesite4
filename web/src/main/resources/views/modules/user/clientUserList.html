@@ -1,0 +1,106 @@
+<% layout('/layouts/default.html', {title: '会员管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 会员管理
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${clientUser}" action="${ctx}/user/clientUser/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">用户名：</label>
+					<div class="control-inline">
+						<#form:input path="userName" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">公司名称：</label>
+					<div class="control-inline">
+						<#form:input path="company" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">登录账户：</label>
+					<div class="control-inline">
+						<#form:input path="account" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">最后登录时间：</label>
+					<div class="control-inline">
+						<#form:input path="lastLoginTime_gte" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false,onpicked:function(){lastLoginTime_lte.click()}});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="lastLoginTime_lte" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">用户等级：</label>
+					<div class="control-inline">
+						<#form:input path="grade" maxlength="2" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">注册时间：</label>
+					<div class="control-inline">
+						<#form:input path="registerDate_gte" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false,onpicked:function(){registerDate_lte.click()}});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="registerDate_lte" readonly="true" maxlength="20" class="form-control Wdate-datetime"
+							dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'用户名', name:'userName', index:'a.user_name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/user/clientUser/form?id='+row.id+'" class="btnList" data-title="编辑会员">'+(val||row.id)+'</a>';
+		}},
+		{header:'所属公司', name:'company', index:'a.company', width:150, align:"left"},
+		{header:'登录账户', name:'account', index:'a.account', width:150, align:"left"},
+		{header:'用户余额', name:'amount', index:'a.amount', width:150, align:"center", formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/user/userStatement/list?userId=\'+row.id+\'" class="btnList" data-title="会员账单">'+js.formatNumber(val, 2, false, '0.00')+'</a>'; // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'用户积分', name:'point', index:'a.point', width:150, align:"center"},
+		{header:'用户经验值', name:'exp', index:'a.exp', width:150, align:"center"},
+		{header:'最后登录时间', name:'lastLoginTime', index:'a.last_login_time', width:150, align:"center"},
+		{header:'用户等级', name:'userGrade.name', index:'a.grade', width:150, align:"center"},
+		{header:'注册时间', name:'registerDate', index:'a.register_date', width:150, align:"center"},
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('user:clientUser:edit')){ %>
+				actions.push('<a href="${ctx}/user/clientUser/form?id='+row.id+'" class="btnList" title="编辑会员"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/user/clientUser/delete?id='+row.id+'" class="btnList" title="删除会员" data-confirm="确认要删除该会员吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+                actions.push('<a href="${ctx}/user/clientUser/couponform?userId='+row.id+'" class="btnList"   title="添加优惠卷"><i class="fa fa-plus"></i></a>&nbsp;');
+                actions.push('<a href="${ctx}/user/userMoney/list?userId='+row.id+'" class="btnList" title="余额明细"><i class="fa fa-bars"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/user/userCoupon/list?userId='+row.id+'" class="btnList" title="我的优惠卷"><i class="fa fa-bars"></i></a>&nbsp;');
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

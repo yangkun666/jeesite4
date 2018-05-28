@@ -1,0 +1,166 @@
+<% layout('/layouts/default.html', {title: '订单管理管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 订单管理管理
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+				<a onclick="excelExport()" class="btn btn-primary" id="btnExport" title="导出"><i class="fa fa-filter"></i> 导出</a>
+				<% if(hasPermi('order:orderInfo:edit')){ %>
+					<a href="${ctx}/order/orderInfo/form" class="btn btn-default btnTool" title="新增订单管理"><i class="fa fa-plus"></i> 新增</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${orderInfo}" action="${ctx}/order/orderInfo/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">用户编号：</label>
+					<div class="control-inline">
+						<#form:input path="userId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">咖啡机ID：</label>
+					<div class="control-inline">
+						<#form:input path="cmId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">经销商：</label>
+					<div class="control-inline">
+						<#form:input path="dealer" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">订单金额：</label>
+					<div class="control-inline">
+						<#form:input path="amount" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">订单状态：</label>
+					<div class="control-inline width-120">
+						<#form:select path="status" dictType="order_state" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">付款总额：</label>
+					<div class="control-inline">
+						<#form:input path="paymentAmount" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">支付渠道：</label>
+					<div class="control-inline">
+						<#form:select path="status" dictType="pay_method" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">支付流水号：</label>
+					<div class="control-inline">
+						<#form:input path="payId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">优惠券编号：</label>
+					<div class="control-inline">
+						<#form:input path="discountId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">支付成功时间：</label>
+					<div class="control-inline">
+						<#form:input path="successDate" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">备注：</label>
+					<div class="control-inline">
+						<#form:input path="remarks" maxlength="256" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">退款流水号：</label>
+					<div class="control-inline">
+						<#form:input path="refundId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">退款时间：</label>
+					<div class="control-inline">
+						<#form:input path="refundDate" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+	function excelExport(){
+        var queryParams = [];
+        var queryFormParams = $("#searchForm").serializeArray();
+        $.each(queryFormParams, function(i, field){
+            queryParams.push(field.name + '=' + field.value);
+        });
+        window.open('${ctx}/order/orderInfo/exportFile' + '?' + queryParams.join('&'));
+    }
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'用户编号', name:'userId', index:'a.user_id', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/order/orderInfo/form?id='+row.id+'" class="btnList" data-title="编辑订单管理">'+(val||row.id)+'</a>';
+		}},
+		{header:'咖啡机ID', name:'cmId', index:'a.cm_id', width:150, align:"left"},
+		{header:'经销商', name:'dealer', index:'a.dealer', width:150, align:"left"},
+		{header:'订单金额', name:'amount', index:'a.amount', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'订单状态', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('order_state')}, val, '未知', true);
+		}},
+		{header:'付款总额', name:'paymentAmount', index:'a.payment_amount', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'支付渠道', name:'payChannel', index:'a.pay_channel', width:150, align:"center", formatter: function(val, obj, row, act){
+                return js.getDictLabel(${@DictUtils.getDictListJson('pay_method')}, val, '', true);
+            }},
+		{header:'支付流水号', name:'payId', index:'a.pay_id', width:150, align:"left"},
+		{header:'优惠券编号', name:'discountId', index:'a.discount_id', width:150, align:"left"},
+		{header:'交易时间', name:'createDate', index:'a.create_date', width:150, align:"center"},
+		{header:'支付成功时间', name:'successDate', index:'a.success_date', width:150, align:"center"},
+		{header:'备注', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'退款流水号', name:'refundId', index:'a.refund_id', width:150, align:"left"},
+		{header:'退款时间', name:'refundDate', index:'a.refund_date', width:150, align:"center"},
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('order:orderInfo:edit')){ %>
+				actions.push('<a href="${ctx}/order/orderInfo/form?id='+row.id+'" class="btnList" title="编辑订单管理"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/order/orderInfo/disable?id='+row.id+'" class="btnList" title="停用订单管理" data-confirm="确认要停用该订单管理吗？"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/order/orderInfo/enable?id='+row.id+'" class="btnList" title="启用订单管理" data-confirm="确认要启用该订单管理吗？"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/order/orderInfo/delete?id='+row.id+'" class="btnList" title="删除订单管理" data-confirm="确认要删除该订单管理吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/order/orderInfo/refund?id='+row.id+'" class="btnList" title="退款" data-confirm="确认要退款吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

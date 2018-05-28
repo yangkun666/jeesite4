@@ -15,7 +15,7 @@ import com.jeesite.common.io.PropertiesUtils;
  * @author ThinkGem
  * @version 2018-1-8
  */
-@SpringBootApplication(scanBasePackages={"com.jeesite.modules"})
+@SpringBootApplication(scanBasePackages={"com.jeesite.modules","com.miaocup"})
 public class Application extends SpringBootServletInitializer {
 	
 	public static void main(String[] args) {
@@ -26,7 +26,8 @@ public class Application extends SpringBootServletInitializer {
 	
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		this.setRegisterErrorPageFilter(false); // 错误页面有容器来处理，而不是SpringBoot
+		// 错误页面有容器来处理，而不是SpringBoot
+		this.setRegisterErrorPageFilter(false);
 		builder.properties(PropertiesUtils.getInstance().getProperties());
 		return builder.sources(Application.class);
 	}

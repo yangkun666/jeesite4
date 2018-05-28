@@ -1,0 +1,119 @@
+<% layout('/layouts/default.html', {title: '保修有礼管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 保修有礼管理
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+				<% if(hasPermi('repair:warranty:edit')){ %>
+					<a href="${ctx}/repair/warranty/form" class="btn btn-default btnTool" title="新增保修有礼"><i class="fa fa-plus"></i> 新增</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${warranty}" action="${ctx}/repair/warranty/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">咖啡机类型：</label>
+					<div class="control-inline">
+						<#form:input path="cmModel" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">经销商：</label>
+					<div class="control-inline">
+						<#form:input path="dealer" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">客户：</label>
+					<div class="control-inline">
+						<#form:input path="customerId" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">保修原因：</label>
+					<div class="control-inline">
+						<#form:input path="reason" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">是否处理：</label>
+					<div class="control-inline width-120">
+						<#form:select path="isHandle" dictType="handle_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">是否送礼：</label>
+					<div class="control-inline width-120">
+						<#form:select path="isGiv" dictType="giv_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">状态：</label>
+					<div class="control-inline width-120">
+						<#form:select path="status" dictType="sys_search_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">备注：</label>
+					<div class="control-inline">
+						<#form:input path="remarks" maxlength="512" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'咖啡机类型', name:'cmModel', index:'a.cm_model', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/repair/warranty/form?id='+row.id+'" class="btnList" data-title="编辑保修有礼">'+(val||row.id)+'</a>';
+		}},
+		{header:'经销商', name:'dealer', index:'a.dealer', width:150, align:"left"},
+		{header:'客户', name:'customerId', index:'a.customer_id', width:150, align:"left"},
+		{header:'保修原因', name:'reason', index:'a.reason', width:150, align:"left"},
+		{header:'是否处理', name:'isHandle', index:'a.is_handle', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('handle_status')}, val, '未知', true);
+		}},
+		{header:'是否送礼', name:'isGiv', index:'a.is_giv', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('giv_status')}, val, '未知', true);
+		}},
+		{header:'状态', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_search_status')}, val, '未知', true);
+		}},
+		{header:'创建时间', name:'createDate', index:'a.create_date', width:150, align:"center"},
+		{header:'备注', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('repair:warranty:edit')){ %>
+				actions.push('<a href="${ctx}/repair/warranty/form?id='+row.id+'" class="btnList" title="编辑保修有礼"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/repair/warranty/disable?id='+row.id+'" class="btnList" title="停用保修有礼" data-confirm="确认要停用该保修有礼吗？"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/repair/warranty/enable?id='+row.id+'" class="btnList" title="启用保修有礼" data-confirm="确认要启用该保修有礼吗？"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/repair/warranty/delete?id='+row.id+'" class="btnList" title="删除保修有礼" data-confirm="确认要删除该保修有礼吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

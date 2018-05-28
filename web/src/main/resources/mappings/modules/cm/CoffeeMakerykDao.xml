@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miaocup.modules.cm.dao.CoffeeMakerykDao">
+	<!-- 查询数据
+	<select id="findList" resultType="CoffeeMaker">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	<select id="findList"  resultType="com.miaocup.modules.cm.entity.CoffeeMakerResult">
+		select o.cm_id as "cmId",c.`code` as "code",p.dealer as "dealer", p.address as "address", count(*) as "count" ,sum(o.payment_amount) as "sum" from t_order_info o , t_coffee_maker c ,t_place p
+		where o.cm_id = c.id  and p.id = c.place_id  and o.`status`='1'
+		<if test="lastStatisticsTime_gte != null and lastStatisticsTime_lte != null ">
+			AND DATE_FORMAT(o.create_date,'%Y-%m-%d') BETWEEN DATE_FORMAT(#{lastStatisticsTime_gte,jdbcType=TIMESTAMP},'%Y-%m-%d') AND DATE_FORMAT(#{lastStatisticsTime_lte,jdbcType=TIMESTAMP},'%Y-%m-%d')
+		</if>
+		<if test="(lastStatisticsTime_gte != null ) and (lastStatisticsTime_lte == null)">
+			AND DATE_FORMAT(o.create_date,'%Y-%m-%d') &gt;= DATE_FORMAT(#{lastStatisticsTime_gte,jdbcType=TIMESTAMP},'%Y-%m-%d')
+		</if>
+		<if test="(lastStatisticsTime_gte == null ) and (lastStatisticsTime_lte != null )">
+			AND DATE_FORMAT(o.create_date,'%Y-%m-%d') &lt;= DATE_FORMAT(#{lastStatisticsTime_lte,jdbcType=TIMESTAMP},'%Y-%m-%d')
+		</if>
+		GROUP BY o.cm_id
+		ORDER BY count(*) desc
+	</select>
+</mapper>

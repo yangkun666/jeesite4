@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		
 		<!-- 核心模块 -->
@@ -42,6 +42,25 @@
 			<groupId>com.jeesite</groupId>
 			<artifactId>jeesite-module-core</artifactId>
 			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.miaocup</groupId>
+			<artifactId>miao-cup-utils</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+		<!--rocketmq-->
+		<dependency>
+			<groupId>com.alibaba.rocketmq</groupId>
+			<artifactId>rocketmq-client</artifactId>
+			<version>3.5.9</version>
+		</dependency>
+
+		<!--redis-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 		
 		<!-- 内容管理模块 

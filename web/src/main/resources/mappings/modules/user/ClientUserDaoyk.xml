@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.miaocup.modules.user.dao.ClientUserDao">
+	
+	<!-- 查询数据
+	<select id="findList" resultType="ClientUser">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+			@Column(name="id", attrName="id", label="用户ID", isPK=true),
+		@Column(name="user_name", attrName="userName", label="用户名", queryType=QueryType.LIKE),
+		@Column(name="account", attrName="account", label="登录账户"),
+		@Column(name="password", attrName="password", label="登录密码"),
+		@Column(name="amount", attrName="amount", label="用户余额"),
+		@Column(name="point", attrName="point", label="用户积分"),
+		@Column(name="exp", attrName="exp", label="用户经验值"),
+		@Column(name="invite_code", attrName="inviteCode", label="邀请码"),
+		@Column(name="last_login_time", attrName="lastLoginTime", label="最后登录时间"),
+		@Column(name="grade", attrName="grade", label="用户等级"),
+		@Column(name="register_date", attrName="registerDate", label="注册时间"),
+		@Column(name="phone", attrName="phone", label="手机号"),
+		@Column(name="open_id", attrName="openId", label="微信Open"),
+	</select> -->
+	<sql id="UserColumns">
+		a.id AS "id" ,
+		a.user_name AS "userName" ,
+		a.account AS "account" ,
+		a.password AS "password" ,
+		a.amount AS "amount" ,
+		a.point AS "point" ,
+		a.exp AS "exp" ,
+		a.invite_code AS "inviteCode" ,
+		a.last_login_time AS "lastLoginTime" ,
+		a.register_date AS "registerDate" ,
+		a.phone AS "phone" ,
+		a.open_id AS "openId"
+	</sql>
+	<select id="findConsumeUser"  resultType="com.miaocup.modules.user.entity.ClientUser">
+		select <include refid="UserColumns"/> from t_client_user a
+		JOIN t_order_info as i on a.id=i.user_id
+		GROUP BY a.id
+	</select>
+</mapper>

@@ -1,0 +1,63 @@
+<% layout('/layouts/default.html', {title: '咖啡机等级配置', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 咖啡机等级配置
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+				<% if(hasPermi('cm:cmGrade:edit')){ %>
+					<a href="${ctx}/cm/cmGrade/form" class="btn btn-default btnTool" title="新增咖啡机等级"><i class="fa fa-plus"></i> 新增</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${cmGrade}" action="${ctx}/cm/cmGrade/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">等级名称：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'等级名称', name:'name', index:'a.name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/cm/cmGrade/form?id='+row.id+'" class="btnList" data-title="编辑咖啡机等级配置">'+(val||row.id)+'</a>';
+		}},
+		{header:'商品发布数', name:'goodsLimit', index:'a.goods_limit', width:150, align:"center"},
+		{header:'图片上传数', name:'imageLimit', index:'a.image_limit', width:150, align:"center"},
+		{header:'升级金额', name:'amountOver', index:'a.amount_over', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'创建时间', name:'createDate', index:'a.create_date', width:150, align:"center"},
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('cm:cmGrade:edit')){ %>
+				actions.push('<a href="${ctx}/cm/cmGrade/form?id='+row.id+'" class="btnList" title="编辑咖啡机等级"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/cm/cmGrade/delete?id='+row.id+'" class="btnList" title="删除咖啡机等级" data-confirm="确认要删除该咖啡机等级吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

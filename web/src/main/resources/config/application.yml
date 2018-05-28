@@ -12,3 +12,18 @@ spring:
     
   main:
     banner-mode: "off"
+
+rocketmq:
+  name-addr: 111.231.75.209:9876
+
+mq:
+
+  command:
+    topic: COMMAND_TOPIC
+    pid: COMMAND_PID
+    cid: COMMAND_CID
+
+  refund:
+    topic: REFUND_TOPIC
+    pid: REFUND_PID
+    cid: REFUND_CID

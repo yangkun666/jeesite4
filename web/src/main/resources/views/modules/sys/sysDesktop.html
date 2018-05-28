@@ -1,0 +1,270 @@
+<% layout('/layouts/default.html', {title: '首页', bodyClass: ''}){ %>
+<!-- <link rel="stylesheet" href="${ctxStatic}/modules/sys/sysDesktop.css?${_version}"> -->
+<style type="text/css">
+
+    .info-box:hover{border:1px 	#DCDCDC solid; cursor: pointer;}
+</style>
+<div class="content pb0">
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <a class="addTabPage" title="咖啡机管理" data-href="${ctx}/cm/coffeeMaker/list">
+                <div class="info-box" >
+                    <span class="info-box-icon bg-aqua"><i class="fa fa-align-justify"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">咖啡机总数</span>
+                        <span class="info-box-number">${cfjNum}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12" >
+            <a class="addTabPage" title="异常咖啡机" data-href="${ctx}/cm/coffeeMaker/list?operStatus=2">
+                <div class="info-box">
+                    <span class="info-box-icon bg-red"><i class="fa fa-google-plus"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">异常咖啡机数量</span>
+                        <span class="info-box-number">${yccfjNum}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="clearfix visible-sm-block"></div>
+
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <a class="addTabPage" title="异常咖啡机" data-href="${ctx}/cm/coffeeMaker/list?operStatus=2">
+                <div class="info-box">
+                    <span class="info-box-icon bg-green"><i class="fa fa-bolt"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">咖啡机预警</span>
+                        <span class="info-box-number">${yjcfjNum}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <a class="addTabPage" title="场地管理" data-href="${ctx}/cm/place/list">
+                <div class="info-box">
+                    <span class="info-box-icon bg-yellow"><i class="fa fa-users"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">管理地区</span>
+                        <span class="info-box-number">${dqNum}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <a class="addTabPage" title="会员管理" data-href="${ctx}/user/clientUser/list">
+                <div class="info-box">
+                    <span class="info-box-icon bg-aqua"><i class="fa fa-align-justify"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">会员关注统计</span>
+                        <span class="info-box-number">${hyNum}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-align-justify"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">消费会员统计</span>
+                    <span class="info-box-number">${xfhyNum}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix visible-sm-block"></div>
+
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-coffee"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">今日咖啡统计</span>
+                    <span class="info-box-number">${JRckNum}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-coffee"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">总咖啡统计</span>
+                    <span class="info-box-number">${ckNum}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <a class="addTabPage" title="订单管理" data-href="${ctx}/order/orderInfo/list">
+                <div class="info-box">
+                    <span class="info-box-icon bg-aqua"><i class="fa fa-align-justify"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">订单管理</span>
+                        <span class="info-box-number">${DDNum}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <a class="addTabPage" title="退款管理" data-href="${ctx}/order/applyRefund/list">
+                <div class="info-box">
+                    <span class="info-box-icon bg-red"><i class="fa fa-align-justify"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">退款管理</span>
+                        <span class="info-box-number">${TKNum}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="clearfix visible-sm-block"></div>
+
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-coffee"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">预留</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-coffee"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">预留</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">月度报告</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-wrench"></i></button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">导出Excel</a></li>
+                                <li><a href="#">导出Word</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">基本设置</a></li>
+                            </ul>
+                        </div>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="chart">
+                                <div id="myChart" style="height:230px;width:99%"></div>
+                                <script src="http://echarts.baidu.com/dist/echarts.common.min.js"></script>
+                                <script>
+                                    option = {
+                                        title : {
+                                            text: '咖啡统计',
+                                            subtext: '数量统计',
+                                            x:'center'
+                                        },
+                                        tooltip : {
+                                            trigger: 'item',
+                                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                        },
+                                        legend: {
+                                            orient : 'vertical',
+                                            x : 'left',
+                                            data:['咖啡']
+                                        },
+                                        toolbox: {
+                                            show : true,
+                                            feature : {
+                                                mark : {show: true},
+                                                dataView : {show: true, readOnly: false},
+                                                magicType : {
+                                                    show: true,
+                                                    type: ['pie', 'funnel'],
+                                                    option: {
+                                                        funnel: {
+                                                            x: '25%',
+                                                            width: '50%',
+                                                            funnelAlign: 'left',
+                                                            max: 1548
+                                                        }
+                                                    }
+                                                },
+                                                restore : {show: true},
+                                                saveAsImage : {show: true}
+                                            }
+                                        },
+                                        calculable : true,
+                                        series : [
+                                            {
+                                                name:'咖啡',
+                                                type:'pie',
+                                                radius : '55%',
+                                                center: ['50%', '60%'],
+                                                data:${json}
+                                            }
+                                        ]
+                                    };
+                                    // 基于准备好的dom，初始化echarts实例
+                                    var myChart = echarts.init(document.getElementById('myChart'));
+                                    myChart.setOption(option);
+                                </script>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="text-center">
+                                <strong>支付方式</strong>
+                            </p>
+                            <div class="progress-group">
+                                <span class="progress-text">微信</span>
+                                <span class="progress-number">${wx}</span>
+                                <div class="progress sm">
+                                    <div class="progress-bar progress-bar-aqua" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-group">
+                                <span class="progress-text">支付宝</span>
+                                <span class="progress-number">${zfb}</span>
+                                <div class="progress sm">
+                                    <div class="progress-bar progress-bar-red" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-group">
+                                <span class="progress-text">银联</span>
+                                <span class="progress-number">${yl}</span>
+                                <div class="progress sm">
+                                    <div class="progress-bar progress-bar-green" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="main-footer m0">
+    <% var productName = @Global.getConfig('productName'), productVersion = @Global.getConfig('productVersion'); %>
+    <div class="pull-right hidden-xs">当前版本： ${productVersion}</div>
+    版权所有 &copy; ${@DateUtils.getYear()} ${productName} - Powered By <a href="http://jeesite.com">JeeSite</a>.
+</footer>
+<% } %>
+<script>
+    $(window).resize(function(){
+        var footerHeight  = $('.main-footer').outerHeight() || 0;
+        var windowHeight  = $(window).height();
+        $('.content').css('min-height', windowHeight - footerHeight)
+    }).resize();
+</script>

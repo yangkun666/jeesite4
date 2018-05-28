@@ -24,9 +24,9 @@ jdbc:
   # Mysql 数据库配置
   type: mysql
   driver: com.mysql.jdbc.Driver
-  url: jdbc:mysql://127.0.0.1:3306/jeesite?useSSL=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+  url: jdbc:mysql://120.78.221.80:3306/miaocup?useSSL=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
   username: root
-  password: 123456
+  password: root
   testSql: SELECT 1
 #
 #  # Oracle 数据库配置
@@ -98,28 +98,29 @@ jdbc:
 #    stat:
 #      enabled: true
 #  
-## Redis 配置
-#redis: 
-#  
-#  # Redis 连接参数
-#  host: 127.0.0.1
-#  port: 6379
-#  isSSL: false
-#  timeout: 2000
-#  password: 1234
-#  database: 0
-#  clientName: ~
-#  
-#  # Redis 连接池配置
-#  pool:
-#    maxIdle: 3
-#    maxTotal: 20
-#
-#  # 是否启用Redis系统缓存及会话
-#  cacheAndSession: false
-#  
-#  # 定义Key的前缀标识
-#  keyPrefix: ${jdbc.tablePrefix}
+# Redis 配置
+redis:
+
+  # Redis 连接参数
+  host: 120.78.221.80
+  port: 6379
+  isSSL: false
+  timeout: 2000
+  password:
+  database: 0
+  clientName: ~
+
+  # Redis 连接池配置
+  pool:
+    minIdle: 16
+    maxIdle: 32
+    maxTotal: 64
+
+  # 是否启用Redis系统缓存及会话
+  cacheAndSession: false
+
+  # 定义Key的前缀标识
+  keyPrefix: ${jdbc.tablePrefix}
 
 #============================#
 #===== System settings ======#
@@ -293,20 +294,20 @@ jdbc:
 #  #共享的SessionId的Cookie名称，保存到跟路径下，第三方应用获取。同一域名下多个项目时需设置共享Cookie的名称。
 #  #shareSessionIdCookieName: ${session.sessionIdCookieName}
 #
-## MyBatis 相关
-#mybatis:
-#
-#  # 扫描基础包设置（Aliases、@MyBatisDao），如果多个，用“,”分隔
-#  scanBasePackage: com.jeesite.modules
-#  
-#  # Mapper文件刷新线程
-#  mapper:
-#    refresh:
-#      enabled: true
-#      delaySeconds: 60
-#      sleepSeconds: 3
-#      mappingPath: mappings
-#  
+# MyBatis 相关
+mybatis:
+
+  # 扫描基础包设置（Aliases、@MyBatisDao），如果多个，用“,”分隔
+  scanBasePackage: com.jeesite.modules,com.miaocup.modules
+
+  # Mapper文件刷新线程
+  mapper:
+    refresh:
+      enabled: true
+      delaySeconds: 60
+      sleepSeconds: 3
+      mappingPath: mappings
+
 ## 缓存设置
 #ehcache:
 #

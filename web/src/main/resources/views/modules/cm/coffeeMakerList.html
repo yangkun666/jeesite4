@@ -1,0 +1,154 @@
+<% layout('/layouts/default.html', {title: '咖啡机管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> 咖啡机管理
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="查询"><i class="fa fa-filter"></i> 查询</a>
+				<% if(hasPermi('cm:coffeeMaker:edit')){ %>
+					<a href="${ctx}/cm/coffeeMaker/form" class="btn btn-default btnTool" title="新增咖啡机"><i class="fa fa-plus"></i> 新增</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${coffeeMaker}" action="${ctx}/cm/coffeeMaker/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">机器ID：</label>
+					<div class="control-inline">
+						<#form:input path="machineId" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">机器编码：</label>
+					<div class="control-inline">
+						<#form:input path="code" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">场地：</label>
+					<div class="control-inline width-120">
+						<#form:select path="placeId" items="${placeList}"
+								itemLabel="address" itemValue="id" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">公司：</label>
+					<div class="control-inline">
+						<#form:input path="dealer" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">型号：</label>
+					<div class="control-inline">
+						<#form:input path="model" maxlength="64" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">等级：</label>
+					<div class="control-inline width-120">
+						<#form:select path="grade" items="${gradeList}"
+								itemLabel="name" itemValue="id" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">类别：</label>
+					<div class="control-inline width-120">
+						<#form:select path="type" dictType="cm_type" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">状态：</label>
+					<div class="control-inline width-120">
+						<#form:select path="status" dictType="cm_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">运行状态：</label>
+					<div class="control-inline width-120">
+						<#form:select path="runStatus" dictType="cm_run_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">经营状态：</label>
+					<div class="control-inline width-120">
+						<#form:select path="operStatus" dictType="cm_oper_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'机器ID', name:'machineId', index:'a.machine_id', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/cm/coffeeMaker/form?id='+row.id+'&code='+row.code+'" class="btnList" data-title="编辑咖啡机">'+(val||row.id)+'</a>';
+		}},
+		{header:'机器编码', name:'code', index:'a.code', width:150, align:"left"},
+		{header:'公司', name:'dealer', index:'a.dealer', width:150, align:"left"},
+        {header:'城市编码', name:'place.code', index:'a.place_id', width:150, align:"center"},
+		{header:'场地名称', name:'place.address', index:'a.place_id', width:150, align:"center"},
+		{header:'型号', name:'model', index:'a.model', width:150, align:"left"},
+		{header:'等级', name:'cmGrade.name', index:'a.grade', width:150, align:"center"},
+		{header:'类别', name:'type', index:'a.type', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('cm_type')}, val, '未知', true);
+		}},
+		{header:'剩余杯量', name:'cupLimit', index:'a.cup_limit', width:150, align:"center"},
+		{header:'开机时间', name:'startupTime', index:'a.startup_time', width:150, align:"center"},
+		{header:'关机时间', name:'shutdownTime', index:'a.shutdown_time', width:150, align:"center"},
+		{header:'默认金额', name:'defaultPrice', index:'a.default_price', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'状态', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_status')}, val, '未知', true);
+		}},
+		{header:'运行状态', name:'runStatus', index:'a.run_status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('cm_run_status')}, val, '未知', true);
+		}},
+		{header:'经营状态', name:'operStatus', index:'a.oper_status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('cm_oper_status')}, val, '未知', true);
+		}},
+		{header:'创建时间', name:'createDate', index:'a.create_date', width:150, align:"center"},
+		{header:'操作', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('cm:coffeeMaker:edit')){ %>
+				actions.push('<a href="${ctx}/cm/coffeeMaker/form?id='+row.id+'&code='+row.code+'" class="btnList" title="编辑咖啡机"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/cm/coffeeMaker/disable?id='+row.id+'&code='+row.code+'" class="btnList" title="停用咖啡机" data-confirm="确认要停用该咖啡机吗？"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/cm/coffeeMaker/enable?id='+row.id+'&code='+row.code+'" class="btnList" title="启用咖啡机" data-confirm="确认要启用该咖啡机吗？"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/cm/coffeeMaker/delete?id='+row.id+'&code='+row.code+'" class="btnList" title="删除咖啡机" data-confirm="确认要删除该咖啡机吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+                actions.push('<a href="javascript:" class="btnMore" title="更多操作"><i class="fa fa-chevron-circle-right"></i></a>&nbsp;');
+                actions.push('<div class="moreItems">');
+                actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=8861&cups=1" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="制作咖啡"><i class="fa fa-check-square-o"></i> 制作小杯咖啡</a>&nbsp;');actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=8861&cups=3" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="制作咖啡"><i class="fa fa-check-square-o"></i> 制作中杯咖啡</a>&nbsp;');actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=8861&cups=4" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="制作咖啡"><i class="fa fa-check-square-o"></i> 制作大杯咖啡</a>&nbsp;');
+                actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=8863" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="开机"><i class="fa fa-check-square-o"></i> 开机</a>&nbsp;');
+                actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=8864" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="关机"><i class="fa fa-check-square-o"></i> 关机</a>&nbsp;');
+                actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=AA38" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="机器除垢设置"><i class="fa fa-check-square-o"></i> 机器除垢设置</a>&nbsp;');
+                actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=AA39" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="水硬度设置"><i class="fa fa-check-square-o"></i> 水硬度设置</a>&nbsp;');
+                actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=AA3A" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="定时关机设置"><i class="fa fa-check-square-o"></i> 定时关机设置</a>&nbsp;');
+                actions.push('<a href="${ctx}/cm/coffeeMaker/command?machineId='+row.machineId+'&machineCode='+row.code+'&command=AA3B" class="btn btn-default btn-xs btnList" data-confirm="确认要执行吗？" title="温度设置"><i class="fa fa-check-square-o"></i> 温度设置</a>&nbsp;');
+                actions.push('</div>');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

@@ -1,0 +1,333 @@
+<% layout('/layouts/default.html', {title: '咖啡机管理', libs: ['validate','fileupload','dataGrid']}){ %>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.2"></script>
+<style type="text/css">*{ font-family: "微软雅黑";} #where,#lonlat,#lonlat2{ width:300px; height:30px; font-size:24px; color:blue;} #but{ width:100px; height:36px; font-size:20px;}</style></head>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${coffeeMaker.isNewRecord ? '新增咖啡机' : '编辑咖啡机'}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${coffeeMaker}" action="${ctx}/cm/coffeeMaker/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">基本信息</div>
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 机器ID：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="machineId" maxlength="64" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 机器编码：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="code" maxlength="64" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 场地：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select multiple="false" blankOption="true" path="placeId" items="${placeList}"
+										itemLabel="address" itemValue="id" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 型号：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="model" maxlength="64" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 等级：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select multiple="false" path="grade" items="${gradeList}"
+										itemLabel="name" itemValue="id" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 类别：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="type" dictType="cm_type" class="form-control required digits" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 开机时间：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="startupTime" readonly="true" maxlength="20" class="form-control Wdate required"
+									dataFormat="time" onclick="WdatePicker({dateFmt:'HH:mm',isShowClear:false});"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 关机时间：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="shutdownTime" readonly="true" maxlength="20" class="form-control Wdate required"
+									dataFormat="time" onclick="WdatePicker({dateFmt:'HH:mm',isShowClear:false});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 杯量：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="cupLimit" maxlength="3" class="form-control required digits"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> 默认金额：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="defaultPrice" class="form-control required number"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> 备注：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:textarea path="remarks" rows="4" maxlength="512" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2"><span class="required ">*</span> 经纬度：</label>
+							<div class="col-sm-10">
+								<center>
+									<input id="where" name="where" type="text" placeholder="请输入地址">
+									<input id="but" type="button"  value="地图查找" class="btn btn-sm btn-primary"  onClick="sear(document.getElementById('where').value);" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 经度：
+									<#form:input id="lonlat" name="lonlat" path="longitude" type="number" maxlength="10"  />纬度：
+									<#form:input id="lonlat2" name="lonlat2" path="latitude"  type="number" maxlength="9"  />
+									<h3 style="color: red;">介绍：输入地点然后点击“地图查找”搜索，再点击地图地点获取相应经纬度</h3>
+									<div style=" margin:auto;width:1000px;height:600px;border:2px solid gray; margin-bottom:50px;" id="container"></div>
+								</center>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2"><span class="required ">*</span> 二维码：</label>
+							<div class="col-sm-10">
+								<#form:fileupload id="uploadImage" bizKey="${coffeeMaker.id}" bizType="qrCode"
+									uploadType="image" multiple="false" class="required" readonly="false"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h4 class="form-unit">咖啡品种</h4>
+				<div class="ml10 mr10">
+					<table id="coffeeDataGrid"></table>
+					<% if (hasPermi('cm:coffeeMaker:edit')){ %>
+						<a href="#" id="coffeeDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10"><i class="fa fa-plus"></i> 增行</a>
+					<% } %>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('cm:coffeeMaker:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> 保 存</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> 关 闭</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script type="text/javascript">
+
+    //如果经纬度没有给个默认值
+    var longitude=105.386515;
+    var latitude=28.91124;
+
+    var map = new BMap.Map("container");
+    map.setDefaultCursor("crosshair");
+    map.enableScrollWheelZoom();
+    var point = new BMap.Point(longitude,latitude);
+    map.centerAndZoom(point, 5);
+    var gc = new BMap.Geocoder();
+    map.addControl(new BMap.NavigationControl());
+    map.addControl(new BMap.OverviewMapControl());
+    map.addControl(new BMap.ScaleControl());
+    map.addControl(new BMap.MapTypeControl());
+    map.addControl(new BMap.CopyrightControl());
+    var marker = new BMap.Marker(point);
+    map.addOverlay(marker);
+    marker.addEventListener("click",
+        function(e) {
+            document.getElementById("lonlat").value = e.point.lng;
+            document.getElementById("lonlat2").value = e.point.lat;
+        });
+    marker.enableDragging();
+    marker.addEventListener("dragend",
+        function(e) {
+            gc.getLocation(e.point,
+                function(rs) {
+                    showLocationInfo(e.point, rs);
+                });
+        });
+    function showLocationInfo(pt, rs) {
+        var opts = {
+            width: 250,
+            height: 150,
+            title: "当前位置"
+        };
+        var addComp = rs.addressComponents;
+        var addr = "当前位置：" + addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber + "<br/>";
+        addr += "纬度: " + pt.lat + ", " + "经度：" + pt.lng;
+        var infoWindow = new BMap.InfoWindow(addr, opts);
+        marker.openInfoWindow(infoWindow);
+    }
+    map.addEventListener("click",
+        function(e) {
+            document.getElementById("lonlat").value = e.point.lng;
+            document.getElementById("lonlat2").value = e.point.lat;
+        });
+    var traffic = new BMap.TrafficLayer();
+    map.addTileLayer(traffic);
+    function iploac(result) {
+        var cityName = result.name;
+    }
+    var myCity = new BMap.LocalCity();
+    myCity.get(iploac);
+    function sear(result) {
+        var local = new BMap.LocalSearch(map, {
+            renderOptions: {
+                map: map
+            }
+        });
+        local.search(result);
+    }
+
+</script>
+<script>
+//初始化咖啡口味DataGrid对象
+$("#coffeeDataGrid").dataGrid({
+
+	data: ${toJson(coffeeMaker.coffeeMapList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'id', editable:true, hidden:true},
+		{header:'咖啡机ID', name:'cmId', editable:true, hidden:true},
+		{header:'咖啡品种', name:'coffeeId', width:150, editable:true,  edittype:'select', editoptions:{'class':'form-control required',
+				items: $.merge([{name:'&nbsp;',id:''}], ${toJson(coffeeList)}),
+				itemLabel: 'name', itemValue: 'id', dataInit: function(element){
+					$(element).select2().on("change",function(){$(this).valid()});
+				}
+			}
+        },
+        {header:'杯量', name:'cups', width:150, editable:true,  edittype:'select', editoptions:{'class':'form-control required',
+                items: $.merge([{name:'&nbsp;',id:''}], [{name:'小杯',id:'1'},{name:'中杯',id:'2'},{name:'大杯',id:'3'},{name:'超大杯',id:'4'}]),
+                itemLabel: 'name', itemValue: 'id', dataInit: function(element){
+                    $(element).select2().on("change",function(){$(this).valid()});
+                }
+            }
+        },
+		{header:'金额', name:'price', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control required number'}},
+		{header:'开始时间', name:'startTime', width:150,
+			formatter:'date', formatoptions:{srcformat:'Y-m-d H:i:s',newformat:'Y-m-d H:i:s'},
+			editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required', 'readonly':'true',
+				dataInit: function(element){ $(element).on('focus', function(){
+					WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});
+				});
+			}}
+		},
+		{header:'结束时间', name:'endTime', width:150, 
+			formatter:'date', formatoptions:{srcformat:'Y-m-d H:i:s',newformat:'Y-m-d H:i:s'},
+			editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required', 'readonly':'true',
+				dataInit: function(element){ $(element).on('focus', function(){
+					WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:false});
+				});
+			}}
+		},
+		{header:'操作', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'你确认要删除这条数据吗？\', function(){$(\'#coffeeDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'你确认要删除这条数据吗？\', function(){$(\'#coffeeDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'})});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#coffeeDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'coffeeMapList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,cmId,cups,coffeeId,price,startTime,endTime', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>
