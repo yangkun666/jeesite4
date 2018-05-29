@@ -24,7 +24,7 @@ jdbc:
   # Mysql 数据库配置
   type: mysql
   driver: com.mysql.jdbc.Driver
-  url: jdbc:mysql://120.78.221.80:3306/miaocup?useSSL=true&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+  url: jdbc:mysql://localhost:3306/miaocup?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false
   username: root
   password: root
   testSql: SELECT 1
@@ -102,7 +102,7 @@ jdbc:
 redis:
 
   # Redis 连接参数
-  host: 120.78.221.80
+  host: localhost
   port: 6379
   isSSL: false
   timeout: 2000
