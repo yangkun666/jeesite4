@@ -26,6 +26,7 @@ import com.miaocup.modules.cm.dao.CoffeeMakerDao;
 import com.jeesite.modules.file.utils.FileUploadUtils;
 import com.miaocup.modules.cm.dao.CoffeeMapDao;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -87,10 +88,16 @@ public class CoffeeMakerService extends CrudService<CoffeeMakerDao, CoffeeMaker>
 	@Override
 	public Page<CoffeeMaker> findPage(Page<CoffeeMaker> page, CoffeeMaker coffeeMaker) {
 		Page<CoffeeMaker> resultPage = super.findPage(page, coffeeMaker);
-		for (CoffeeMaker cm : resultPage.getList()) {
+		Iterator<CoffeeMaker> iterator = resultPage.getList().iterator();
+		while(iterator.hasNext()) {
+			CoffeeMaker cm = iterator.next();
 			String status = redisClientUtil.get(MiaocupContants.CM_RUN_STATUS_KEY + cm.getMachineId());
 			if (StringUtils.isNotBlank(status)) {
 				cm.setRunStatus(Integer.valueOf(status));
+			}
+			if (coffeeMaker.getRunStatus() != null && !Objects.equals(coffeeMaker.getRunStatus(), cm.getRunStatus())) {
+				iterator.remove();
+				continue;
 			}
 			String cupsCount = redisClientUtil.get(MiaocupContants.CM_CUPS_COUNT_KEY + coffeeMaker.getMachineId());
 			if (StringUtils.isNotBlank(cupsCount)) {
